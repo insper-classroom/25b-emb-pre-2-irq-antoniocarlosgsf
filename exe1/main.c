@@ -29,10 +29,10 @@ int main() {
 
   while (true) {
     if (fall_flag) {
-      printf("fall");
+      printf("fall \n");
       fall_flag = 0;
     } else if (rise_flag){
-      printf("rise");
+      printf("rise \n");
       rise_flag = 0;
     }
   }
