@@ -10,18 +10,30 @@ const uint64_t LONG_PRESS = 800000;
 
 volatile int btn_fall = 0;
 volatile int btn_rise = 0;
+volatile int long_press = 0;
 
-absolute_time_t t_start;
-absolute_time_t t_end;
-absolute_time_t dt;
+volatile absolute_time_t t_start;
+volatile absolute_time_t t_end;
+// volatile absolute_time_t dt;
 
 void btn_callback(uint gpio, uint32_t events){
+    absolute_time_t now = get_absolute_time();
+
     if (events == 0x4){
         btn_fall = 1;
+        t_start = now;
     }
 
     if (events == 0x8){
         btn_rise = 1;
+        t_end = now;
+        int64_t dt = absolute_time_diff_us(t_start, t_end);
+        if (dt > (int64_t) 800000){
+            long_press = 1;
+        } else{
+            long_press = 0;
+        }
+        
     }
     return ;
 }
@@ -44,15 +56,12 @@ int main() {
 
     while (true) {
         if (btn_fall){
-            t_start = get_absolute_time();
             btn_fall = 0;
         }
 
         if (btn_rise) {
-            t_end = get_absolute_time();
-            dt = absolute_time_diff_us(t_start, t_end);
             btn_rise = 0;
-            if (dt > LONG_PRESS){
+            if (long_press){
                 printf("Aperto longo!\n");
             } else {
                 printf("Aperto curto!\n");
